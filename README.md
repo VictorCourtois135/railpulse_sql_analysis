@@ -52,32 +52,42 @@ Key relationships:
 ```
 railpulse_sql_analysis/
 ├── data/
-│   └── static_data/           # Raw GTFS .txt files downloaded from the SNCB portal
+│   └── static_data/
 ├── db/
-│   └── sncb.db                 # Generated database (not committed to git)
+│   └── sncb.db
 ├── sql/
-│   ├── schema.sql              # All table definitions (static + real-time), PK/FK, indexes
-│   └── queries.sql             # The 5 key analytical queries (answers to the mission brief)
+│   ├── schema.sql
+│   └── queries.sql
 ├── scripts/
 │   ├── ingestion/
-│   │   └── import_data.py      # One-time ingestion: static GTFS .txt files -> db/sncb.db
+│   │   └── import_data.py
 │   └── realtime/
-│       ├── fetch_realtime.py   # Polls the GTFS-RT TripUpdate feed, appends to db/sncb.db
-│       └── fetch_alerts.py     # Polls the GTFS-RT Alert feed, appends to db/sncb.db
+│       ├── fetch_realtime.py
+│       └── fetch_alerts.py
 ├── docs/
-│   └── erd.png                 # (optional) static export of the ERD, as backup for the drawdb link
+│   └── erd.png
 └── README.md
 ```
-
+| Path | Description |
+|---|---|
+| `data/static_data/` | Raw GTFS `.txt` files downloaded from the SNCB portal |
+| `db/sncb.db` | Generated database — **not committed to git** (see note below) |
+| `sql/schema.sql` | All table definitions (static + real-time), PK/FK, indexes |
+| `sql/queries.sql` | The 5 key analytical queries (answers to the mission brief) |
+| `scripts/ingestion/import_data.py` | One-time ingestion: static GTFS `.txt` files → `db/sncb.db` |
+| `scripts/realtime/fetch_realtime.py` | Polls the GTFS-RT TripUpdate feed, appends to `db/sncb.db` |
+| `scripts/realtime/fetch_alerts.py` | Polls the GTFS-RT Alert feed, appends to `db/sncb.db` |
+| `docs/erd.png` |  static export of the ERD, as backup for the drawdb link |
+ 
 All scripts compute their paths relative to their own file location (`Path(__file__)`), so they
 work correctly regardless of which directory you run them from.
-
+ 
 > **Note on `db/sncb.db`:** the generated database is **not committed to this repository**
 > (~600 MB+ once fully imported — well over GitHub's file size limits). It is excluded via
 > `.gitignore` and regenerated locally by running `scripts/ingestion/import_data.py` (step 4
 > below). This has been tested end-to-end from a clean clone: running the steps in this README,
 > in order, reproduces the exact same database and query results documented here.
-
+ 
 > **Note:** `fetch_realtime.py` and `fetch_alerts.py` were run manually to build up the real-time
 > history used in this analysis. A scheduling/cron mechanism to automate this (nice-to-have) was
 > not implemented in this sprint — planned for Sprint 2, where the SNCB brief itself notes this is
