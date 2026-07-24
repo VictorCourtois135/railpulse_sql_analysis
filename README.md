@@ -17,18 +17,18 @@ The Belgian National Railway wants a clear overview of operational performance a
 
 ```
 ┌─────────────────────┐        ┌──────────────────────┐
-│   GTFS Static Feed   │        │  GTFS-Realtime Feeds  │
-│  (agency, routes,    │        │  (trip updates,       │
-│   stops, trips,      │        │   service alerts)     │
-│   stop_times, ...)   │        │                        │
-└──────────┬───────────┘        └───────────┬────────────┘
-           │ one-time import                │ polled periodically
-           ▼                                 ▼
-┌─────────────────────────────────────────────────────────┐
+│   GTFS Static Feed  │        │  GTFS-Realtime Feeds │
+│  (agency, routes,   │        │  (trip updates,      │
+│   stops, trips,     │        │   service alerts)    │
+│   stop_times, ...)  │        │                      │
+└──────────┬──────────┘        └───────────┬──────────┘
+           │ one-time import               │ polled periodically
+           ▼                               ▼
+┌───────────────────────────────────────────────────────────┐
 │                       sncb.db (SQLite)                    │
-│   10 static tables  +  9 real-time snapshot/detail tables  │
-│           normalized with strict PK / FK constraints       │
-└─────────────────────────────────────────────────────────┘
+│   10 static tables  +  9 real-time snapshot/detail tables │
+│           normalized with strict PK / FK constraints      │
+└───────────────────────────────────────────────────────────┘
                              │
                              ▼
                   SQL analysis (schema.sql, queries.sql)
