@@ -14,14 +14,18 @@ import sqlite3
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from dotenv import load_dotenv
 
 SCRIPT_DIR = Path(__file__).resolve().parent      # scripts/realtime/
 PROJECT_ROOT = SCRIPT_DIR.parent.parent            # railpulse_sql_analysis/
 DB_PATH = PROJECT_ROOT / "db" / "sncb.db"
+
+load_dotenv(PROJECT_ROOT / ".env")   # loads SNCB_API_KEY from .env, if present
+
 API_URL = "https://api-management-opendata-production.azure-api.net/api/gtfs/feed/nmbssncb/rt/trip-update/"
 API_HEADERS = {
     'Cache-Control': 'no-cache',
-    'bmc-partner-key': os.environ["SNCB_API_KEY"],  # set this env var before running
+    'bmc-partner-key': os.environ["SNCB_API_KEY"],  # set in .env (see .env.example)
 }
 
 
@@ -129,7 +133,11 @@ def store_feed(conn, feed_json):
 
 def main():
     conn = sqlite3.connect(DB_PATH)
-    conn.execute("PRAGMA foreign_keys = ON")
+    # Foreign keys are OFF here on purpose: GTFS-Realtime can legitimately
+    # reference a trip_id/stop_id that doesn't exist in the static schedule
+    # (e.g. an ADDED/extra train, scheduleRelationship=1). The FK
+    # declarations in schema.sql remain for documentation purposes.
+    conn.execute("PRAGMA foreign_keys = OFF")
     conn.executescript(SCHEMA)
     conn.commit()
 

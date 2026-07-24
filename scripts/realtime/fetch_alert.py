@@ -24,10 +24,14 @@ import sqlite3
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from dotenv import load_dotenv
 
 SCRIPT_DIR = Path(__file__).resolve().parent      # scripts/realtime/
 PROJECT_ROOT = SCRIPT_DIR.parent.parent            # railpulse_sql_analysis/
 DB_PATH = PROJECT_ROOT / "db" / "sncb.db"
+
+load_dotenv(PROJECT_ROOT / ".env")   # loads SNCB_API_KEY from .env, if present
+
 API_URL = "https://api-management-opendata-production.azure-api.net/api/gtfs/feed/nmbssncb/rt/alert/"
 API_HEADERS = {
     'Cache-Control': 'no-cache',
@@ -175,7 +179,11 @@ def store_feed(conn, feed_json):
 
 def main():
     conn = sqlite3.connect(DB_PATH)
-    conn.execute("PRAGMA foreign_keys = ON")
+    # Foreign keys are OFF here on purpose: alerts can reference routes/
+    # stops/trips that are momentarily absent or mismatched between the
+    # real-time and static feeds. The FK declarations in schema.sql
+    # remain for documentation purposes.
+    conn.execute("PRAGMA foreign_keys = OFF")
     conn.executescript(SCHEMA)
     conn.commit()
 
